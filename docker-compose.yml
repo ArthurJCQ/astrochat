@@ -1,0 +1,25 @@
+version: '3'
+services:
+    database:
+        image: postgres:11
+        ports:
+        - 5432:5432
+        volumes:
+        - db-data:/var/lib/postgresql/data
+        environment:
+            POSTGRES_USER: '${DB_USER}'
+            POSTGRES_PASSWORD: '${DB_PASSWORD}'
+            POSTGRES_DATABASE: '${DB_NAME}'
+    mercure:
+        image: dunglas/mercure
+        ports:
+        - 80:80
+        environment:
+            PUBLISH_URL: '${MERCURE_PUBLISH_URL}'
+            JWT_KEY: '${MERCURE_JWT_KEY}'
+            ALLOW_ANONYMOUS: '${MERCURE_ALLOW_ANONYMOUS}'
+            CORS_ALLOWED_ORIGINS: '${MERCURE_CORS_ALLOWED_ORIGINS}'
+            PUBLISH_ALLOWED_ORIGINS: '${MERCURE_PUBLISH_ALLOWED_ORIGINS}'
+
+volumes:
+  db-data:
