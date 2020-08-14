@@ -7,23 +7,23 @@ namespace App\Services\Mercure;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key;
-use Lcobucci\JWT\Token;
 
 class JWTProvider
 {
-    private string $secret;
+    private string $key;
 
-    public function __construct(string $secret)
+    public function __construct(string $key)
     {
-        $this->secret = $secret;
+        $this->key = $key;
     }
 
-    public function __invoke(): Token
+    public function __invoke(): string
     {
         $signer = new Sha256();
 
         return (new Builder())
-            ->withClaim('mercure', ['publish' => '[*]'])
-            ->getToken($signer, new Key($this->secret));
+            ->withClaim('mercure', ['publish' => ['*']])
+            ->getToken($signer, new Key($this->key))
+            ->__toString();
     }
 }

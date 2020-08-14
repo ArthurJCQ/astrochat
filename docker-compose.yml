@@ -1,5 +1,18 @@
 version: '3'
 services:
+    php:
+        build: ./docker/php
+        env_file: '.env'
+        volumes:
+        - './:/var/www/mercure-chat:rw'
+
+    nginx:
+        build: ./docker/nginx
+        ports:
+        - 81:80
+        volumes:
+        - './public/:/var/www/mercure-chat/public'
+
     database:
         image: postgres:11
         ports:
@@ -10,10 +23,11 @@ services:
             POSTGRES_USER: '${DB_USER}'
             POSTGRES_PASSWORD: '${DB_PASSWORD}'
             POSTGRES_DATABASE: '${DB_NAME}'
+
     mercure:
         image: dunglas/mercure
         ports:
-        - 80:80
+        - 3000:80
         environment:
             PUBLISH_URL: '${MERCURE_PUBLISH_URL}'
             JWT_KEY: '${MERCURE_JWT_KEY}'

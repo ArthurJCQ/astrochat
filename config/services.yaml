@@ -31,4 +31,4 @@ services:
     # please note that last definitions always *replace* previous ones
     App\Services\Mercure\JWTProvider:
         arguments:
-            $secret: '%env(MERCURE_JWT_KEY)%'
+            $key: '%env(MERCURE_JWT_KEY)%'

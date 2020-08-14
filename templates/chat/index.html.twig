@@ -1,38 +1,53 @@
 {% extends 'base.html.twig' %}
 
-{% block stylesheets %}
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-{% endblock %}
-
-{% block title %}Hello ChatController!{% endblock %}
+{% block title %}Chat{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
 
 <div class="example-wrapper">
-    <h1>Chat</h1>
+    <h1>Channel {{ channel.name }}</h1>
+    <div class="container" style="height: 600px">
+        <div class="container bg-light h-75">
+
+        </div>
+        <div class="container row">
+            <input id="message" class="input-group-text col-sm-9" placeholder="Message" type="text" />
+            <button id="submmit" type="submit" class="btn btn-success col-sm-3">Send</button>
+        </div>
+    </div>
 </div>
 {% endblock %}
 {% block javascripts %}
     <script>
-        const url = new URL('http://localhost/.well-known/mercure');
-        url.searchParams.append('topic', 'http://localhost/messagerie/{id}');
+        const url = new URL('http://localhost:3000/.well-known/mercure');
+        url.searchParams.append('topic', 'http://localhost:81/message/{id}');
         const eventSource = new EventSource(url);
 
-        eventSource.onmessage = e => {
-             document.querySelector('h1').insertAdjacentHTML(
-                'afterend',
-                '<div class="alert alert-success">Message recu !</div>'
+        eventSource.onmessage = ({data}) => {
+            const message = JSON.parse(data);
+             document.querySelector('.bg-light').insertAdjacentHTML(
+                'beforeend',
+                `<div class="row w-75 float-right">
+                    <p class="alert alert-info w-100">${message.content}</p>
+                </div>`
             )
-            window.setTimeout(() => {
-                const $alert = document.querySelector('.alert');
-                $alert.parentNode.removeChild($alert);
-            },
-                2000
-            )
+        }
+
+        const submit = document.querySelector('button');
+        submit.onclick = e => {
+            const message = document.getElementById('message');
+            const data = {
+                'content': message.value,
+                'channel': {{ channel.id }}
+            }
+            console.log(data);
+            fetch('/message', {
+                method: 'POST',
+                body: JSON.stringify(data)
+            }).then((response) => {
+                message.value = '';
+                console.log(response);
+            });
         }
     </script>
 {% endblock %}
