@@ -2,22 +2,22 @@
 
 namespace App\Controller;
 
-use App\Entity\Channel;
+use App\Repository\ChannelRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class HomeController extends AbstractController
+class ChannelController extends AbstractController
 {
     /**
      * @Route("/", name="home")
      */
-    public function index(): Response
+    public function getChannels(ChannelRepository $channelRepository): Response
     {
-        $channels = $this->getDoctrine()->getRepository(Channel::class)->findAll();
+        $channels = $channelRepository->findAll();
 
         return $this->render('home/index.html.twig', [
-            'channels'           => $channels ?? []
+            'channels' => $channels ?? []
         ]);
     }
 }
