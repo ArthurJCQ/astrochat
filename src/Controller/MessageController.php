@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\Message;
 use App\Repository\ChannelRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityNotFoundException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,7 +38,9 @@ class MessageController extends AbstractController
         $channel = $channelRepository->findOneBy([
             'id' => $data['channel']
         ]);
-        $content = $data['content'];
+        if (!$channel) {
+            throw new EntityNotFoundException('Message have to be sent on a specific channel');
+        }
 
         $message = new Message();
         $message->setContent($content);
