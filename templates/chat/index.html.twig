@@ -3,7 +3,6 @@
 {% block title %}Chat{% endblock %}
 
 {% block body %}
-
 <div class="example-wrapper">
     {% if app.user %}
         <div class="mb-3">
@@ -11,33 +10,53 @@
         </div>
     {% endif %}
     <h1>Channel {{ channel.name }}</h1>
-    <div class="container" style="height: 600px">
-        <div class="container bg-light h-75">
+    <div class="container">
+        <div class="container bg-light" style="height: 600px; overflow: scroll">
             {% for message in messages %}
-                <div class="row w-75 float-right">
-                    <p class="alert alert-info w-100">{{ message.content }}</p>
-                </div>
+                {% if app.user == message.author %}
+                    <div class="row w-75 float-right">
+                        <p class="alert alert-info w-100">{{ message.content }}</p>
+                    </div>
+                {% else %}
+                    <div class="row w-75 float-left">
+                        <p class="alert alert-success w-100">
+                            {{ message.content }}
+                        </p>
+                    </div>
+                {% endif %}
             {% endfor %}
         </div>
         <div class="container row">
             <input id="message" class="input-group-text col-sm-9" placeholder="Message" type="text" />
-            <button id="submmit" type="submit" class="btn btn-success col-sm-3">Send</button>
+            <button id="submit" type="submit" class="btn btn-success col-sm-3">Send</button>
         </div>
     </div>
 </div>
 {% endblock %}
 {% block javascripts %}
     <script>
-        const url = new URL('http://localhost:3000/.well-known/mercure');
-        url.searchParams.append('topic', 'http://localhost:81/message/{id}');
+        // 'mercure' is used as the docker-compose service name. We replace it by the actual url for the browser.
+        const link = '{{ app.request.attributes.get('_links').getLinksbyRel('mercure')[0].getHref }}'
+            .replace("mercure", "localhost:3000");
+
+        const url = new URL(link);
+        url.searchParams.append('topic', 'http://astrochat.com/message/{id}');
         const eventSource = new EventSource(url);
+
+        const appUser = {{ app.user.id }};
 
         eventSource.onmessage = ({data}) => {
             const message = JSON.parse(data);
+            console.log(appUser);
+            console.log(message.author.id)
              document.querySelector('.bg-light').insertAdjacentHTML(
                 'beforeend',
-                `<div class="row w-75 float-right">
+                 appUser == message.author.id ?
+                 `<div class="row w-75 float-right">
                     <p class="alert alert-info w-100">${message.content}</p>
+                </div>` :
+                 `<div class="row w-75 float-left">
+                    <p class="alert alert-success w-100">${message.content}</p>
                 </div>`
             )
         }

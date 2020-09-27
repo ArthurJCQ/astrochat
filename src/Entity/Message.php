@@ -6,6 +6,7 @@ namespace App\Entity;
 
 use App\Repository\MessageRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -38,8 +39,9 @@ class Message
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="messages")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups("message")
      */
-    private User $author;
+    private UserInterface $author;
 
     /**
      * @ORM\Column(type="datetime")
@@ -50,7 +52,6 @@ class Message
     {
         $this->createdAt = new \DateTime();
     }
-
 
     public function getId(): ?int
     {
@@ -86,7 +87,7 @@ class Message
         return $this->author;
     }
 
-    public function setAuthor(?User $author): self
+    public function setAuthor(?UserInterface $author): self
     {
         $this->author = $author;
 

@@ -45,6 +45,7 @@ class MessageController extends AbstractController
         $message = new Message();
         $message->setContent($content);
         $message->setChannel($channel);
+        $message->setAuthor($this->getUser());
 
         $em->persist($message);
         $em->flush();
@@ -53,7 +54,12 @@ class MessageController extends AbstractController
             'groups' => ['message']
         ]);
 
-        $update = new Update(sprintf('http://localhost:81/message/%s', $message->getId()), $jsonMessage);
+        $update = new Update(
+            sprintf('http://astrochat.com/message/%s',
+                $message->getId()),
+            $jsonMessage,
+//            true
+        );
         $publisher($update);
 
         return new JsonResponse(
