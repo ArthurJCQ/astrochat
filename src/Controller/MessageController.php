@@ -55,10 +55,10 @@ class MessageController extends AbstractController
         ]);
 
         $update = new Update(
-            sprintf('http://astrochat.com/message/%s',
-                $message->getId()),
+            sprintf('http://astrochat.com/channel/%s',
+                $channel->getId()),
             $jsonMessage,
-//            true
+            true
         );
         $publisher($update);
 

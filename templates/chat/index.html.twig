@@ -12,13 +12,17 @@
     <h1>Channel {{ channel.name }}</h1>
     <div class="container" style="height: 600px">
         <div class="container bg-light h-75 overflow-auto">
-            {% for message in channel.messages %}
+            {% for message in messages %}
                 {% if app.user == message.author %}
                     <div class="row w-75 float-right">
-                        <p class="alert alert-info w-100">{{ message.content }}</p>
+                        <b>{{ message.author.username }}</b>
+                        <p class="alert alert-info w-100">
+                            {{ message.content }}
+                        </p>
                     </div>
                 {% else %}
                     <div class="row w-75 float-left">
+                        <b>{{ message.author.username }}</b>
                         <p class="alert alert-success w-100">
                             {{ message.content }}
                         </p>
@@ -46,15 +50,14 @@
         }
         form.addEventListener('submit', handleForm);
 
-
         // 'mercure' is used as the docker-compose service name. We replace it by the actual url for the browser.
         const link = '{{ app.request.attributes.get('_links').getLinksbyRel('mercure')[0].getHref }}'
             .replace("mercure", "localhost:3000");
 
         const url = new URL(link);
-        url.searchParams.append('topic', 'http://astrochat.com/message/{id}');
+        url.searchParams.append('topic', 'http://astrochat.com/channel/{id}');
 
-        const eventSource = new EventSource(url);
+        const eventSource = new EventSource(url, {withCredentials: true});
 
         const appUser = {{ app.user.id }};
 
@@ -64,9 +67,11 @@
                 'beforeend',
                  appUser === message.author.id ?
                  `<div class="row w-75 float-right">
+                    <b>${message.author.username}</b>
                     <p class="alert alert-info w-100">${message.content}</p>
                 </div>` :
                  `<div class="row w-75 float-left">
+                    <b>${message.author.username}</b>
                     <p class="alert alert-success w-100">${message.content}</p>
                 </div>`
             )

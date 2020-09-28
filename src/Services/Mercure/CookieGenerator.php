@@ -6,8 +6,8 @@ namespace App\Services\Mercure;
 
 use App\Entity\Channel;
 use Lcobucci\JWT\Builder;
+use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key;
-use Lcobucci\JWT\Signer\Rsa\Sha256;
 
 class CookieGenerator
 {
@@ -18,12 +18,13 @@ class CookieGenerator
         $this->key = $key;
     }
 
-    public function generate(): string
+    public function __invoke(Channel $channel): string
     {
         $signer = new Sha256();
         return (new Builder())
-            ->withClaim('mercure', ['subscribe' => ['http://astrochat.com/message/1']])
+            ->withClaim('mercure', ['subscribe' => [sprintf('http://astrochat.com/channel/%s', $channel->getId())]])
             ->getToken($signer, new Key($this->key))
-            ->__toString();
+            ->__toString()
+        ;
     }
 }

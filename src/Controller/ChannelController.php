@@ -13,11 +13,12 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\WebLink\Link;
 
 class ChannelController extends AbstractController
 {
     /**
-     * @Route("/channels", name="home")
+     * @Route("/", name="home")
      */
     public function getChannels(ChannelRepository $channelRepository): Response
     {
@@ -43,7 +44,7 @@ class ChannelController extends AbstractController
     {
         $messages = $messageRepository->findBy([
             'channel' => $channel
-        ], ['id' => 'ASC']);
+        ], ['createdAt' => 'ASC']);
 
         $hubUrl = $this->getParameter('mercure.default_hub');
         $this->addLink($request, new Link('mercure', $hubUrl));
@@ -53,10 +54,11 @@ class ChannelController extends AbstractController
             'messages' => $messages
         ]);
         $response->headers->setCookie(
-            new Cookie(
+            Cookie::create(
                 'mercureAuthorization',
-                $cookieGenerator->generate(),
+                $cookieGenerator($channel),
                 new \DateTime('+1day'),
+                '/.well-known/mercure'
             )
         );
         return $response;
