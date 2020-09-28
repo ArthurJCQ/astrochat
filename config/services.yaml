@@ -32,3 +32,7 @@ services:
     App\Services\Mercure\JWTProvider:
         arguments:
             $key: '%env(MERCURE_JWT_KEY)%'
+
+    App\Services\Mercure\CookieGenerator:
+        arguments:
+            $key: '%env(MERCURE_JWT_KEY)%'
