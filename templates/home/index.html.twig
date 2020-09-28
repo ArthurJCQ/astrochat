@@ -6,7 +6,7 @@
 
 <div class="example-wrapper">
     {% if channels %}
-        <h2>On which chan do you want to chat ?</h2>
+        <h2>Which chan do you want to join ?</h2>
         <table class="table table-striped">
             <tbody>
             {% for channel in channels %}
@@ -16,9 +16,9 @@
                         <a class="btn btn-primary float-right" href="{{ path('chat', {id: channel.id}) }}">Go chat !</a>
                     </th>
                 </tr>
+            {% endfor %}
             </tbody>
         </table>
-        {% endfor %}
     {% else %}
         <div>
             <div class="alert alert-danger text-center">No Channels found. Create Users with the <b>create:channel</b> command</div>
